@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixel Pop Clicker 🎮</title>
+<title>Pixel Pop 3DS 🎮</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 body {
   margin:0;
-  background:#0f172a;
-  font-family: monospace;
+  background:#0b1020;
+  font-family:'Press Start 2P', monospace;
   color:#e2e8f0;
   display:flex;
   justify-content:center;
@@ -16,31 +17,47 @@ body {
   height:100vh;
 }
 
-#console {
-  width:360px;
-  height:640px;
-  background:#1e293b;
-  border-radius:20px;
-  box-shadow:0 0 40px #000;
+#shell {
+  width:380px;
+  height:700px;
+  background:#111827;
+  border-radius:25px;
+  box-shadow:0 0 50px #000;
   padding:15px;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
+  position:relative;
 }
 
 .screen {
   background:#020617;
   border:4px solid #334155;
-  border-radius:10px;
+  border-radius:12px;
   padding:10px;
   height:45%;
+  position:relative;
+}
+
+.screen::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  pointer-events:none;
 }
 
 #top {
   display:flex;
   flex-direction:column;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
 }
 
 #bottom {
@@ -49,8 +66,7 @@ body {
   gap:10px;
 }
 
-#clickBtn {
-  font-size:20px;
+#tap {
   padding:20px;
   background:#22c55e;
   border:none;
@@ -58,9 +74,7 @@ body {
   cursor:pointer;
 }
 
-#clickBtn:active {
-  transform:scale(0.95);
-}
+#tap:active { transform:scale(0.9); }
 
 .shop button {
   width:100%;
@@ -72,73 +86,153 @@ body {
   cursor:pointer;
 }
 
-.stat {
-  margin:5px 0;
+.controls {
+  position:absolute;
+  bottom:10px;
+  left:10px;
+}
+
+.dpad button {
+  width:30px;
+  height:30px;
+  margin:2px;
+  background:#1f2937;
+  border:none;
+}
+
+.abxy {
+  position:absolute;
+  right:10px;
+  bottom:10px;
+}
+
+.abxy button {
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  margin:3px;
+  background:#2563eb;
+  border:none;
+  color:white;
+}
+
+.event {
+  color:#facc15;
 }
 </style>
 </head>
 <body>
-<div id="console">
+<div id="shell">
   <div id="top" class="screen">
-    <h3>Pixel Pop 🍪</h3>
-    <div class="stat">Clicks: <span id="clicks">0</span></div>
-    <div class="stat">Per Click: <span id="cpc">1</span></div>
-    <div class="stat">Per Second: <span id="cps">0</span></div>
+    <div>Pixel Pop</div>
+    <div>Clicks: <span id="clicks">0</span></div>
+    <div>CPC: <span id="cpc">1</span></div>
+    <div>CPS: <span id="cps">0</span></div>
+    <div id="event"></div>
   </div>
 
   <div id="bottom" class="screen">
-    <button id="clickBtn">TAP!</button>
+    <button id="tap">TAP</button>
     <div class="shop">
-      <button onclick="buy('cursor')">Cursor (+1 cps) - <span id="cursorCost">10</span></button>
-      <button onclick="buy('booster')">Booster (+1 click) - <span id="boosterCost">25</span></button>
-      <button onclick="buy('factory')">Factory (+5 cps) - <span id="factoryCost">100</span></button>
+      <button onclick="buy('cursor')">Cursor +1 CPS (<span id="c1">10</span>)</button>
+      <button onclick="buy('booster')">Booster +1 CPC (<span id="c2">25</span>)</button>
+      <button onclick="buy('factory')">Factory +5 CPS (<span id="c3">100</span>)</button>
     </div>
+  </div>
+
+  <div class="controls">
+    <div class="dpad">
+      <button onclick="bonus(1)">▲</button><br>
+      <button onclick="bonus(2)">◀</button>
+      <button onclick="bonus(3)">▶</button><br>
+      <button onclick="bonus(4)">▼</button>
+    </div>
+  </div>
+
+  <div class="abxy">
+    <button onclick="bonus(5)">A</button>
+    <button onclick="bonus(6)">B</button>
+    <button onclick="bonus(7)">X</button>
+    <button onclick="bonus(8)">Y</button>
   </div>
 </div>
 
 <script>
-let clicks = 0;
-let cpc = 1;
-let cps = 0;
+let clicks = parseInt(localStorage.getItem('clicks')) || 0;
+let cpc = parseInt(localStorage.getItem('cpc')) || 1;
+let cps = parseInt(localStorage.getItem('cps')) || 0;
 
-let costs = {
-  cursor: 10,
-  booster: 25,
-  factory: 100
+let costs = JSON.parse(localStorage.getItem('costs')) || {
+  cursor:10, booster:25, factory:100
 };
+
+let multiplier = 1;
+
+function save() {
+  localStorage.setItem('clicks', clicks);
+  localStorage.setItem('cpc', cpc);
+  localStorage.setItem('cps', cps);
+  localStorage.setItem('costs', JSON.stringify(costs));
+}
 
 function update() {
   document.getElementById('clicks').innerText = Math.floor(clicks);
   document.getElementById('cpc').innerText = cpc;
   document.getElementById('cps').innerText = cps;
-
-  document.getElementById('cursorCost').innerText = costs.cursor;
-  document.getElementById('boosterCost').innerText = costs.booster;
-  document.getElementById('factoryCost').innerText = costs.factory;
+  document.getElementById('c1').innerText = costs.cursor;
+  document.getElementById('c2').innerText = costs.booster;
+  document.getElementById('c3').innerText = costs.factory;
 }
 
-document.getElementById('clickBtn').onclick = () => {
-  clicks += cpc;
+document.getElementById('tap').onclick = () => {
+  clicks += cpc * multiplier;
   update();
+  save();
 };
 
 function buy(type) {
   if (clicks < costs[type]) return;
-
   clicks -= costs[type];
 
-  if (type === 'cursor') cps += 1;
-  if (type === 'booster') cpc += 1;
-  if (type === 'factory') cps += 5;
+  if (type==='cursor') cps+=1;
+  if (type==='booster') cpc+=1;
+  if (type==='factory') cps+=5;
 
-  costs[type] = Math.floor(costs[type] * 1.5);
-  update();
+  costs[type] = Math.floor(costs[type]*1.5);
+  update(); save();
 }
 
-setInterval(() => {
-  clicks += cps / 10;
-  update();
-}, 100);
+setInterval(()=>{
+  clicks += (cps * multiplier)/10;
+  update(); save();
+},100);
+
+function eventTrigger() {
+  const e = Math.random();
+  const el = document.getElementById('event');
+
+  if (e < 0.33) {
+    el.innerHTML = "⚡ Overclock!";
+    multiplier = 2;
+    setTimeout(()=>{ multiplier = 1; el.innerHTML=""; },10000);
+  } else if (e < 0.66) {
+    el.innerHTML = "🔋 Low Battery! Tap fast!";
+    multiplier = 0.5;
+    setTimeout(()=>{ multiplier = 1; el.innerHTML=""; },10000);
+  } else {
+    el.innerHTML = "🎁 Bonus Clicks!";
+    clicks += 50;
+    update(); save();
+    setTimeout(()=> el.innerHTML="",5000);
+  }
+}
+
+setInterval(eventTrigger, 25000);
+
+function bonus(id) {
+  clicks += id * 2;
+  update(); save();
+}
 
 update();
 </script>
