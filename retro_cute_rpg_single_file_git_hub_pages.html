@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pixel Sprout RPG 🌱</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  background: #1e1e2f;
+  color: #fff;
+  font-family: 'Press Start 2P', cursive;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#game {
+  width: 800px;
+  height: 500px;
+  background: #2a2a40;
+  border: 4px solid #fff;
+  box-shadow: 0 0 20px #000;
+  display: flex;
+  flex-direction: column;
+}
+
+#screen {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+#ui {
+  border-top: 2px solid #fff;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  flex: 1;
+  background: #3e3e60;
+  border: 2px solid #fff;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #5e5e90;
+}
+
+.hp {
+  color: #7CFC00;
+}
+
+.enemy {
+  color: #ff7a7a;
+}
+
+.log {
+  margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="screen"></div>
+  <div id="ui"></div>
+</div>
+
+<script>
+const screen = document.getElementById("screen");
+const ui = document.getElementById("ui");
+
+let player = {
+  hp: 30,
+  maxHp: 30,
+  atk: 5,
+  potions: 2
+};
+
+let enemy;
+let inBattle = false;
+
+function log(text) {
+  const div = document.createElement("div");
+  div.className = "log";
+  div.innerHTML = text;
+  screen.appendChild(div);
+  screen.scrollTop = screen.scrollHeight;
+}
+
+function clearUI() {
+  ui.innerHTML = "";
+}
+
+function button(text, action) {
+  const btn = document.createElement("button");
+  btn.innerText = text;
+  btn.onclick = action;
+  ui.appendChild(btn);
+}
+
+function startGame() {
+  screen.innerHTML = "";
+  log("🌱 Welcome to Pixel Sprout RPG!");
+  log("A tiny adventure begins...");
+  mainMenu();
+}
+
+function mainMenu() {
+  clearUI();
+  button("🌲 Explore", explore);
+  button("💖 Rest", rest);
+}
+
+function explore() {
+  screen.innerHTML = "";
+  if (Math.random() < 0.7) {
+    startBattle();
+  } else {
+    log("You found nothing... just vibes 🌸");
+    mainMenu();
+  }
+}
+
+function rest() {
+  screen.innerHTML = "";
+  player.hp = player.maxHp;
+  log("You take a cozy nap and recover HP 💖");
+  mainMenu();
+}
+
+function startBattle() {
+  inBattle = true;
+  enemy = {
+    hp: 20 + Math.floor(Math.random()*10),
+    atk: 4
+  };
+
+  log(`A wild sprout beast appears! 🌿 <span class='enemy'>HP: ${enemy.hp}</span>`);
+  battleMenu();
+}
+
+function battleMenu() {
+  clearUI();
+
+  button("⚔️ Attack", attack);
+  button("🧪 Potion", potion);
+  button("🏃 Run", run);
+}
+
+function attack() {
+  let dmg = player.atk + Math.floor(Math.random()*3);
+  enemy.hp -= dmg;
+  log(`You hit for ${dmg}!`);
+
+  if (enemy.hp <= 0) {
+    winBattle();
+    return;
+  }
+
+  enemyTurn();
+}
+
+function potion() {
+  if (player.potions <= 0) {
+    log("No potions left!");
+    return;
+  }
+
+  player.potions--;
+  player.hp += 10;
+  if (player.hp > player.maxHp) player.hp = player.maxHp;
+
+  log("You drink a potion 💖");
+  enemyTurn();
+}
+
+function run() {
+  if (Math.random() < 0.5) {
+    log("You escaped! 🌪️");
+    inBattle = false;
+    mainMenu();
+  } else {
+    log("Couldn't escape!");
+    enemyTurn();
+  }
+}
+
+function enemyTurn() {
+  let dmg = enemy.atk + Math.floor(Math.random()*3);
+  player.hp -= dmg;
+  log(`<span class='enemy'>Enemy hits for ${dmg}!</span>`);
+
+  if (player.hp <= 0) {
+    gameOver();
+    return;
+  }
+
+  updateStats();
+}
+
+function updateStats() {
+  log(`<span class='hp'>Your HP: ${player.hp}/${player.maxHp}</span>`);
+  battleMenu();
+}
+
+function winBattle() {
+  log("You defeated the sprout beast! 🌱✨");
+  player.potions++;
+  inBattle = false;
+  mainMenu();
+}
+
+function gameOver() {
+  clearUI();
+  log("💀 You have been defeated...");
+  button("Restart", startGame);
+}
+
+startGame();
+</script>
+</body>
+</html>
