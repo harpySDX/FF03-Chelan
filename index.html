@@ -3,158 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixel Pop 3DS 🎮</title>
+<title>Pastel Pop Switch 🎮</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-body {
+:root{
+  --bg:#0f0f1a;
+  --console:#1b1b2e;
+  --screen:#0b1020;
+  --pink:#f9a8d4;
+  --blue:#93c5fd;
+  --green:#86efac;
+  --yellow:#fde68a;
+}
+
+body{
   margin:0;
-  background:#0b1020;
+  background:linear-gradient(135deg,#0b1020,#1b1b2e);
   font-family:'Press Start 2P', monospace;
-  color:#e2e8f0;
+  color:#e5e7eb;
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
 }
 
-#shell {
-  width:380px;
-  height:700px;
-  background:#111827;
-  border-radius:25px;
-  box-shadow:0 0 50px #000;
-  padding:15px;
+/* SWITCH BODY */
+#console{
+  width:900px;
+  height:420px;
+  background:var(--console);
+  border-radius:40px;
+  box-shadow:0 0 60px rgba(0,0,0,0.7);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px;
+  position:relative;
+}
+
+/* JOYCONS */
+.joycon{
+  width:120px;
+  height:360px;
+  border-radius:30px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+#leftJoy{
+  background:linear-gradient(#93c5fd,#60a5fa);
+}
+
+#rightJoy{
+  background:linear-gradient(#f9a8d4,#f472b6);
+}
+
+button{
+  font-family:inherit;
+  cursor:pointer;
+}
+
+/* JOY BUTTONS */
+.joyBtn{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,0.2);
+}
+
+.smallBtn{
+  width:30px;
+  height:30px;
+  border:none;
+  background:rgba(255,255,255,0.15);
+  border-radius:8px;
+}
+
+/* SCREEN */
+#screen{
+  flex:1;
+  height:100%;
+  background:var(--screen);
+  border-radius:30px;
+  margin:0 20px;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
+  padding:20px;
   position:relative;
+  overflow:hidden;
 }
 
-.screen {
-  background:#020617;
-  border:4px solid #334155;
-  border-radius:12px;
-  padding:10px;
-  height:45%;
-  position:relative;
-}
-
-.screen::after {
+/* PASTEL GRID BACKGROUND */
+#screen::before{
   content:"";
   position:absolute;
   inset:0;
-  background: repeating-linear-gradient(
+  background-image:
+    linear-gradient(rgba(147,197,253,0.08) 2px,transparent 2px),
+    linear-gradient(90deg,rgba(249,168,212,0.08) 2px,transparent 2px);
+  background-size:24px 24px;
+  pointer-events:none;
+}
+
+/* SCANLINES */
+#screen::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
     to bottom,
     rgba(255,255,255,0.03),
     rgba(255,255,255,0.03) 2px,
     transparent 2px,
-    transparent 4px
+    transparent 5px
   );
   pointer-events:none;
 }
 
-#top {
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+/* TOP INFO */
+#top{
+  z-index:2;
+  text-align:center;
+  font-size:10px;
+  line-height:1.6;
 }
 
-#bottom {
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-#tap {
+/* TAP AREA */
+#tap{
+  width:100%;
   padding:20px;
-  background:#22c55e;
+  border:none;
+  border-radius:15px;
+  background:linear-gradient(90deg,var(--green),var(--blue));
+  color:#0b1020;
+  font-size:10px;
+}
+
+#tap:active{transform:scale(0.95);}
+
+/* SHOP */
+.shop button{
+  width:100%;
+  margin-top:5px;
+  padding:8px;
   border:none;
   border-radius:10px;
-  cursor:pointer;
+  background:#2a2a40;
+  color:#fff;
+  font-size:8px;
 }
 
-#tap:active { transform:scale(0.9); }
-
-.shop button {
-  width:100%;
-  padding:8px;
-  background:#334155;
-  border:none;
-  color:white;
-  margin-top:5px;
-  cursor:pointer;
+.event{
+  color:var(--yellow);
+  font-size:8px;
 }
 
-.controls {
+/* SAVE INDICATOR */
+#save{
   position:absolute;
   bottom:10px;
-  left:10px;
-}
-
-.dpad button {
-  width:30px;
-  height:30px;
-  margin:2px;
-  background:#1f2937;
-  border:none;
-}
-
-.abxy {
-  position:absolute;
-  right:10px;
-  bottom:10px;
-}
-
-.abxy button {
-  width:35px;
-  height:35px;
-  border-radius:50%;
-  margin:3px;
-  background:#2563eb;
-  border:none;
-  color:white;
-}
-
-.event {
-  color:#facc15;
+  right:15px;
+  font-size:8px;
+  opacity:0.5;
 }
 </style>
 </head>
 <body>
-<div id="shell">
-  <div id="top" class="screen">
-    <div>Pixel Pop</div>
-    <div>Clicks: <span id="clicks">0</span></div>
-    <div>CPC: <span id="cpc">1</span></div>
-    <div>CPS: <span id="cps">0</span></div>
-    <div id="event"></div>
+
+<div id="console">
+
+  <!-- LEFT JOYCON -->
+  <div id="leftJoy" class="joycon">
+    <button class="smallBtn" onclick="bonus(1)">▲</button>
+    <div>
+      <button class="smallBtn" onclick="bonus(2)">◀</button>
+      <button class="smallBtn" onclick="bonus(3)">▶</button>
+    </div>
+    <button class="smallBtn" onclick="bonus(4)">▼</button>
   </div>
 
-  <div id="bottom" class="screen">
-    <button id="tap">TAP</button>
+  <!-- SCREEN -->
+  <div id="screen">
+    <div id="top">
+      <div>🍡 Pastel Pop Switch</div>
+      <div>Clicks: <span id="clicks">0</span></div>
+      <div>CPC: <span id="cpc">1</span></div>
+      <div>CPS: <span id="cps">0</span></div>
+      <div id="event" class="event"></div>
+    </div>
+
+    <button id="tap">TAP 🍬</button>
+
     <div class="shop">
       <button onclick="buy('cursor')">Cursor +1 CPS (<span id="c1">10</span>)</button>
       <button onclick="buy('booster')">Booster +1 CPC (<span id="c2">25</span>)</button>
       <button onclick="buy('factory')">Factory +5 CPS (<span id="c3">100</span>)</button>
     </div>
+
+    <div id="save">autosaving...</div>
   </div>
 
-  <div class="controls">
-    <div class="dpad">
-      <button onclick="bonus(1)">▲</button><br>
-      <button onclick="bonus(2)">◀</button>
-      <button onclick="bonus(3)">▶</button><br>
-      <button onclick="bonus(4)">▼</button>
-    </div>
+  <!-- RIGHT JOYCON -->
+  <div id="rightJoy" class="joycon">
+    <button class="joyBtn" onclick="bonus(5)">A</button>
+    <button class="joyBtn" onclick="bonus(6)">B</button>
+    <button class="joyBtn" onclick="bonus(7)">X</button>
+    <button class="joyBtn" onclick="bonus(8)">Y</button>
   </div>
 
-  <div class="abxy">
-    <button onclick="bonus(5)">A</button>
-    <button onclick="bonus(6)">B</button>
-    <button onclick="bonus(7)">X</button>
-    <button onclick="bonus(8)">Y</button>
-  </div>
 </div>
 
 <script>
@@ -163,78 +224,72 @@ let cpc = parseInt(localStorage.getItem('cpc')) || 1;
 let cps = parseInt(localStorage.getItem('cps')) || 0;
 
 let costs = JSON.parse(localStorage.getItem('costs')) || {
-  cursor:10, booster:25, factory:100
+  cursor:10,
+  booster:25,
+  factory:100
 };
 
 let multiplier = 1;
 
-function save() {
-  localStorage.setItem('clicks', clicks);
-  localStorage.setItem('cpc', cpc);
-  localStorage.setItem('cps', cps);
-  localStorage.setItem('costs', JSON.stringify(costs));
+function save(){
+  localStorage.setItem('clicks',clicks);
+  localStorage.setItem('cpc',cpc);
+  localStorage.setItem('cps',cps);
+  localStorage.setItem('costs',JSON.stringify(costs));
+  document.getElementById('save').innerText = "saved ✔";
+  setTimeout(()=>document.getElementById('save').innerText="autosaving...",1000);
 }
 
-function update() {
-  document.getElementById('clicks').innerText = Math.floor(clicks);
-  document.getElementById('cpc').innerText = cpc;
-  document.getElementById('cps').innerText = cps;
-  document.getElementById('c1').innerText = costs.cursor;
-  document.getElementById('c2').innerText = costs.booster;
-  document.getElementById('c3').innerText = costs.factory;
+function update(){
+  document.getElementById('clicks').innerText=Math.floor(clicks);
+  document.getElementById('cpc').innerText=cpc;
+  document.getElementById('cps').innerText=cps;
+  document.getElementById('c1').innerText=costs.cursor;
+  document.getElementById('c2').innerText=costs.booster;
+  document.getElementById('c3').innerText=costs.factory;
 }
 
-document.getElementById('tap').onclick = () => {
-  clicks += cpc * multiplier;
-  update();
-  save();
+document.getElementById('tap').onclick=()=>{
+  clicks+=cpc*multiplier;
+  update();save();
 };
 
-function buy(type) {
-  if (clicks < costs[type]) return;
-  clicks -= costs[type];
-
-  if (type==='cursor') cps+=1;
-  if (type==='booster') cpc+=1;
-  if (type==='factory') cps+=5;
-
-  costs[type] = Math.floor(costs[type]*1.5);
-  update(); save();
+function buy(type){
+  if(clicks<costs[type])return;
+  clicks-=costs[type];
+  if(type==='cursor')cps+=1;
+  if(type==='booster')cpc+=1;
+  if(type==='factory')cps+=5;
+  costs[type]=Math.floor(costs[type]*1.5);
+  update();save();
 }
 
 setInterval(()=>{
-  clicks += (cps * multiplier)/10;
-  update(); save();
+  clicks+=(cps*multiplier)/10;
+  update();save();
 },100);
 
-function eventTrigger() {
-  const e = Math.random();
-  const el = document.getElementById('event');
+function eventTrigger(){
+  const el=document.getElementById('event');
+  const r=Math.random();
 
-  if (e < 0.33) {
-    el.innerHTML = "⚡ Overclock!";
-    multiplier = 2;
-    setTimeout(()=>{ multiplier = 1; el.innerHTML=""; },10000);
-  } else if (e < 0.66) {
-    el.innerHTML = "🔋 Low Battery! Tap fast!";
-    multiplier = 0.5;
-    setTimeout(()=>{ multiplier = 1; el.innerHTML=""; },10000);
-  } else {
-    el.innerHTML = "🎁 Bonus Clicks!";
-    clicks += 50;
-    update(); save();
-    setTimeout(()=> el.innerHTML="",5000);
+  if(r<0.33){el.innerText="⚡ sugar rush!";multiplier=2;
+    setTimeout(()=>{multiplier=1;el.innerText="";},8000);
+  }
+  else if(r<0.66){el.innerText="🍃 sleepy mode";multiplier=0.5;
+    setTimeout(()=>{multiplier=1;el.innerText="";},8000);
+  }
+  else{el.innerText="🍬 candy burst!";clicks+=50;save();update();
+    setTimeout(()=>el.innerText="",5000);
   }
 }
 
-setInterval(eventTrigger, 25000);
+setInterval(eventTrigger,20000);
 
-function bonus(id) {
-  clicks += id * 2;
-  update(); save();
-}
+function bonus(id){clicks+=id*2;update();save();}
 
 update();
 </script>
+
 </body>
 </html>
