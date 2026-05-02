@@ -1,229 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pixel Sprout RPG 🌱</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Pop Clicker 🎮</title>
 <style>
 body {
-  margin: 0;
-  background: #1e1e2f;
-  color: #fff;
-  font-family: 'Press Start 2P', cursive;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  margin:0;
+  background:#0f172a;
+  font-family: monospace;
+  color:#e2e8f0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-#game {
-  width: 800px;
-  height: 500px;
-  background: #2a2a40;
-  border: 4px solid #fff;
-  box-shadow: 0 0 20px #000;
-  display: flex;
-  flex-direction: column;
+#console {
+  width:360px;
+  height:640px;
+  background:#1e293b;
+  border-radius:20px;
+  box-shadow:0 0 40px #000;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
 
-#screen {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
+.screen {
+  background:#020617;
+  border:4px solid #334155;
+  border-radius:10px;
+  padding:10px;
+  height:45%;
 }
 
-#ui {
-  border-top: 2px solid #fff;
-  padding: 10px;
-  display: flex;
-  gap: 10px;
+#top {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 
-button {
-  flex: 1;
-  background: #3e3e60;
-  border: 2px solid #fff;
-  color: white;
-  padding: 10px;
-  cursor: pointer;
+#bottom {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-button:hover {
-  background: #5e5e90;
+#clickBtn {
+  font-size:20px;
+  padding:20px;
+  background:#22c55e;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
 }
 
-.hp {
-  color: #7CFC00;
+#clickBtn:active {
+  transform:scale(0.95);
 }
 
-.enemy {
-  color: #ff7a7a;
+.shop button {
+  width:100%;
+  padding:8px;
+  background:#334155;
+  border:none;
+  color:white;
+  margin-top:5px;
+  cursor:pointer;
 }
 
-.log {
-  margin-bottom: 10px;
+.stat {
+  margin:5px 0;
 }
 </style>
 </head>
 <body>
-<div id="game">
-  <div id="screen"></div>
-  <div id="ui"></div>
+<div id="console">
+  <div id="top" class="screen">
+    <h3>Pixel Pop 🍪</h3>
+    <div class="stat">Clicks: <span id="clicks">0</span></div>
+    <div class="stat">Per Click: <span id="cpc">1</span></div>
+    <div class="stat">Per Second: <span id="cps">0</span></div>
+  </div>
+
+  <div id="bottom" class="screen">
+    <button id="clickBtn">TAP!</button>
+    <div class="shop">
+      <button onclick="buy('cursor')">Cursor (+1 cps) - <span id="cursorCost">10</span></button>
+      <button onclick="buy('booster')">Booster (+1 click) - <span id="boosterCost">25</span></button>
+      <button onclick="buy('factory')">Factory (+5 cps) - <span id="factoryCost">100</span></button>
+    </div>
+  </div>
 </div>
 
 <script>
-const screen = document.getElementById("screen");
-const ui = document.getElementById("ui");
+let clicks = 0;
+let cpc = 1;
+let cps = 0;
 
-let player = {
-  hp: 30,
-  maxHp: 30,
-  atk: 5,
-  potions: 2
+let costs = {
+  cursor: 10,
+  booster: 25,
+  factory: 100
 };
 
-let enemy;
-let inBattle = false;
+function update() {
+  document.getElementById('clicks').innerText = Math.floor(clicks);
+  document.getElementById('cpc').innerText = cpc;
+  document.getElementById('cps').innerText = cps;
 
-function log(text) {
-  const div = document.createElement("div");
-  div.className = "log";
-  div.innerHTML = text;
-  screen.appendChild(div);
-  screen.scrollTop = screen.scrollHeight;
+  document.getElementById('cursorCost').innerText = costs.cursor;
+  document.getElementById('boosterCost').innerText = costs.booster;
+  document.getElementById('factoryCost').innerText = costs.factory;
 }
 
-function clearUI() {
-  ui.innerHTML = "";
+document.getElementById('clickBtn').onclick = () => {
+  clicks += cpc;
+  update();
+};
+
+function buy(type) {
+  if (clicks < costs[type]) return;
+
+  clicks -= costs[type];
+
+  if (type === 'cursor') cps += 1;
+  if (type === 'booster') cpc += 1;
+  if (type === 'factory') cps += 5;
+
+  costs[type] = Math.floor(costs[type] * 1.5);
+  update();
 }
 
-function button(text, action) {
-  const btn = document.createElement("button");
-  btn.innerText = text;
-  btn.onclick = action;
-  ui.appendChild(btn);
-}
+setInterval(() => {
+  clicks += cps / 10;
+  update();
+}, 100);
 
-function startGame() {
-  screen.innerHTML = "";
-  log("🌱 Welcome to Pixel Sprout RPG!");
-  log("A tiny adventure begins...");
-  mainMenu();
-}
-
-function mainMenu() {
-  clearUI();
-  button("🌲 Explore", explore);
-  button("💖 Rest", rest);
-}
-
-function explore() {
-  screen.innerHTML = "";
-  if (Math.random() < 0.7) {
-    startBattle();
-  } else {
-    log("You found nothing... just vibes 🌸");
-    mainMenu();
-  }
-}
-
-function rest() {
-  screen.innerHTML = "";
-  player.hp = player.maxHp;
-  log("You take a cozy nap and recover HP 💖");
-  mainMenu();
-}
-
-function startBattle() {
-  inBattle = true;
-  enemy = {
-    hp: 20 + Math.floor(Math.random()*10),
-    atk: 4
-  };
-
-  log(`A wild sprout beast appears! 🌿 <span class='enemy'>HP: ${enemy.hp}</span>`);
-  battleMenu();
-}
-
-function battleMenu() {
-  clearUI();
-
-  button("⚔️ Attack", attack);
-  button("🧪 Potion", potion);
-  button("🏃 Run", run);
-}
-
-function attack() {
-  let dmg = player.atk + Math.floor(Math.random()*3);
-  enemy.hp -= dmg;
-  log(`You hit for ${dmg}!`);
-
-  if (enemy.hp <= 0) {
-    winBattle();
-    return;
-  }
-
-  enemyTurn();
-}
-
-function potion() {
-  if (player.potions <= 0) {
-    log("No potions left!");
-    return;
-  }
-
-  player.potions--;
-  player.hp += 10;
-  if (player.hp > player.maxHp) player.hp = player.maxHp;
-
-  log("You drink a potion 💖");
-  enemyTurn();
-}
-
-function run() {
-  if (Math.random() < 0.5) {
-    log("You escaped! 🌪️");
-    inBattle = false;
-    mainMenu();
-  } else {
-    log("Couldn't escape!");
-    enemyTurn();
-  }
-}
-
-function enemyTurn() {
-  let dmg = enemy.atk + Math.floor(Math.random()*3);
-  player.hp -= dmg;
-  log(`<span class='enemy'>Enemy hits for ${dmg}!</span>`);
-
-  if (player.hp <= 0) {
-    gameOver();
-    return;
-  }
-
-  updateStats();
-}
-
-function updateStats() {
-  log(`<span class='hp'>Your HP: ${player.hp}/${player.maxHp}</span>`);
-  battleMenu();
-}
-
-function winBattle() {
-  log("You defeated the sprout beast! 🌱✨");
-  player.potions++;
-  inBattle = false;
-  mainMenu();
-}
-
-function gameOver() {
-  clearUI();
-  log("💀 You have been defeated...");
-  button("Restart", startGame);
-}
-
-startGame();
+update();
 </script>
 </body>
 </html>
